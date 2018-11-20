@@ -16,17 +16,28 @@ class node : # class abstraite
         self.enfants = kwargs.get('enfants')
         self.gen = kwargs.get('gen')
     
-    def isRoot():   # test 
+    def isRoot(self):   # test 
         if self.parent:
-            return false
+            return (False)
         else:
-            return true
-    def isLeaf():  # test
+            return (True)
+    
+    def isLeaf(self):  # test
         if self.enfants:
-            return false
+            return (False)
         else:
-            return true
-# fin class    
+            return (True)
+# fin class 
+
+def afficher( list_node ) :
+    for node in list_node : 
+        if (node.isRoot() ): print("\nLa racine est ", node.gen, "\t .")
+        elif (node.isLeaf() ): print("\nune feuille : ", node.gen, "\t .") 
+        else : print("\nun noeud : ", node.gen, "\t .")
+# fin def
+
+
+
     """
     niveau # position dans l'arbre
     distance # durée évolutive (en MA)
@@ -53,21 +64,21 @@ g.close() # on a arbre !
     #list_gene_tree[0].isRoot()  # test qui renvoie true
     
 """
-def gene() :
-    with open("gene_tree.nwk") as g:
+def gene(fin = 0) :
+    with open("gene_tree.nwk") as g :
         arbre = g.read()  # premiere ligne du ficher
         arbre = arbre.strip("\n")
     g.close() # on a arbre !
-    return (arbre)
+    return (arbre[fin:])
 #list_tree = []   # créer la liste des nodes de l'arbre
     #list_gene_tree[0].isRoot()  # test qui renvoie true
 
-def species() :
+def species(fin =0) :
     with open("species_tree.nwk") as s:
         arbre = s.read()  # premiere ligne du ficher
         arbre = arbre.strip("\n")
     s.close() # on a arbre !
-    return (arbre)
+    return (arbre[fin:])
 #list_tree = []   # créer la liste des nodes de l'arbre
     #list_species_tree[0].isRoot()  # test qui renvoie true
 #"""
@@ -79,30 +90,40 @@ def control_tree(arbre) :
     print("longueur de l'arbre = " , len(arbre))
 # fin 
 
-def parcour (arbre, niveau = 0, index = 1) :  # commencer à la fin "
+def parcour (arbre, i = False , niveau = 0 ) :  # commencer à la fin "
     # niveau = niveau de l'arbre
     # index = l'indice de la lettre suivante
     list_node = [] 
-    i = (len(arbre) - index)  # on demarre au dernier caractere 
+    
+    if not (i) :  i = (len(arbre) - 1)   # on demarre au dernier caractere 
+    
     while ( i >= 0) :
+        print ("Controle lettre = ", arbre[i])
+        print("prochain ? \t(y/n)")
+        if ( input() == 'n' ) : return (list_node)
     #for i in arbre :
         #compteur += 1
         if (arbre[i] == ';') :  # C le root !
-            list_node.append(node(gen = niveau, enfant = parcour(arbre, niveau +1, index +1)))
+            print("c'est le pied !")
+            list_node.append(node(gen = niveau, enfant = parcour(arbre, i -1, niveau +1)))
             
         elif (arbre[i] == ')' )  : # entre dans une feuillle
+            print("nouvelle feuille")
+            list_node.append(node(gen = niveau, enfant = parcour(arbre, i -1, niveau + 1)))
                 #niveau += 1   # local variable qui descrit : self.gen 
-            list_node.append(node(gen = niveau, enfant = parcour(arbre, niveau + 1, index +1)))
             
         elif (arbre[i] == ',' ) : # création d'un "frére" : feuille orthologue
+            print("orthologue")
             list_node.append(node(gen = niveau))
             
         elif (arbre[i] == '(' ) : # fermer le node : relation parent/enfants
-            return ("Zone en travaux : Veuillez revenir plutard !")
-        else : # valeur ou longueur : "I know RegEx"
-            continue
+            print("fermeture du noeud")
+            print("Zone en travaux : Veuillez revenir plutard !")
+        #↨else : # valeur ou longueur : "I know RegEx"
+            #continue
             #return ("Zone en travaux : Ne revenez jamais !")
         i -= 1 #decrementation du while
+        
     #list_tree = list_tree.extend(list_node) 
     return (list_node )
 # .
@@ -116,12 +137,12 @@ while retry :
         print("Vous avez choisi l'arbre des gènes.")
         retry = False
         control_tree(gene())
-        print ("\nla liste des node de l'arbre = \n",  parcour(gene()) )
+        print ("\nla liste des node de l'arbre = \n",  afficher (parcour(gene())) )
     elif ans == '2' :
         print("Vous avez choisi l'arbre des espèces.")
         retry = False
         control_tree(species())
-        print ("\nla liste des node de l'arbre = \n",  parcour(species()) )
+        print ("\nla liste des node de l'arbre = \n", afficher (parcour(species())) )
     else : print ("Tapper 1 ou 2 \nstp !")
 # .
 
